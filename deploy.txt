@@ -1,0 +1,15 @@
+HOW TO DEPLOY ON APP ENGINE
+
+1. Install SDK
+    set "C:\Users\User\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin" on environment variable
+    how to setup?
+        -right click on your pc icon and clik properties
+        -go to advance setting
+        -click environment variable
+        -go to 2nd container and click path
+        -click new and paste the path file
+2. setting .yaml file
+3. go to cmd:
+    >gcloud auth login
+    >gcloud init
+    >gcloud app deploy

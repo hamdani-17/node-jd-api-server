@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const slugify = require('slugify');
 
+
+// mongoose.plugin(slug);
+
 const Schema = mongoose.Schema;
 
 const hoodSchema = new Schema({
@@ -11,6 +14,7 @@ const hoodSchema = new Schema({
         //unique: true,
         required: [true, 'A property must have a project name']
       },
+    slug: String,
     area_group:{
         type: String,
         required: [true, 'A property must have a price'],
@@ -73,7 +77,7 @@ const hoodSchema = new Schema({
 
 //DOCUMENT MIDDLEWARE: runs before .save() and .create()
 hoodSchema.pre('save', function(next) {
-    this.slug = slugify(this.place, {lower:true});
+    this.slug = slugify(this.hood, {lower: true});
     next();
 });
 

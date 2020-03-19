@@ -2,7 +2,7 @@ const Amenities = require('./../models/amenModel');
 const Hood = require('./../models/hoodModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
-const factory = require ('./handlerFactory');
+//const factory = require ('./handlerFactory');
 
 
 
@@ -114,41 +114,6 @@ exports.updateAmen  = catchAsync(async (req, res, next) => {
         });
 });
 
-exports.getStat = catchAsync(async (req, res) => {
-  const stats = await Sale.aggregate([
-    {
-      $match: { price: { $gte: 40000 } } // area = what query?
-    },
-    {
-      $group: {
-        _id: '$p_type',
-        num: { $sum: 1 },
-        avgPrice: { $avg: '$price' },
-        sumPrice: { $sum: '$price' },
-        maxPrice: { $max: '$price' },
-        minPrice: { $min: '$price' },
-        avgSize: { $avg: '$built_up_sf' },          
-        avgPsf: { $avg: '$psf' },
-        avgDuration: { $avg: '$duration' },
-        avgVar: { $avg: '$var' },
-        avgVarPct: { $avg: '$var_pct' }
-        //places: { $push: '$area' }
-      }
-    },
-    {
-      $sort: { avgPrice: -1 }
-    }
-  ]);
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      stats
-    }
-  });
-});
-
-
 exports.getAmenInHoodPolygon = catchAsync(async (req, res, next) => {
 
   const poly = await Hood.find(req.params);// dapat kuchai
@@ -177,19 +142,21 @@ exports.getAmenInHoodPolygon = catchAsync(async (req, res, next) => {
 });
 
 exports.pointInPolygon = catchAsync(async(req, res, next) => {
-  const poly = await Hood.find(req.params);
-  const [doc]= poly.map(Hood =>Hood.location.coordinates);
+  // const poly = await Hood.find(req.params);
+  // const [doc]= poly.map(Hood =>Hood.location.coordinates);
 
   const point = await Amenities.find(req.params);
   const [doc1]= point.map(Amenities =>Amenities.location.coordinates)
+  console.log(doc1);
 
-  await Hood.find({ "polygon":{
-    type: "Polygon",
-    coordinates: doc
-    }
-  });
 
-  const result = await Amenities.find({
+  // await Hood.find({ "polygon":{
+  //   type: "Polygon",
+  //   coordinates: doc
+  //   }
+  // });
+
+  const result = await Hood.find({
     polygon:{
       $geoIntersects:{
         $geometry:{
@@ -212,12 +179,6 @@ exports.pointInPolygon = catchAsync(async(req, res, next) => {
 
 
 exports.getAmenitiesNear = catchAsync(async(req,res,next) => {  
-
-  // const poly = await Amenities.find(req.params);
- 
-  // const [doc]= poly.map(Amenities =>Amenities.location.coordinates);
-
-  //str=JSON.stringify(doc);
 
   const {latlng} = req.params;
    

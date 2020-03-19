@@ -64,6 +64,10 @@ const rentalSchema = new Schema({
     bathroom: {
         type: String,
         required: [true, 'A rental must have a bathroom '],
+    },
+    slug : {
+        type: String,
+        required: true
     }
 },
 {
@@ -72,6 +76,7 @@ const rentalSchema = new Schema({
 }
 );
 
+
 rentalSchema.index({location: "2dsphere"});
 
 //DOCUMENT MIDDLEWARE: runs before .save() and .create()
@@ -79,6 +84,18 @@ rentalSchema.pre('save', function(next) {
     this.slug = slugify(this.place, {lower:true});
     next();
 });
+
+function slugify(string) {
+    
+    return string.toString().toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+      .replace(/&/g, '-and-') // Replace & with 'and'
+      .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+      .replace(/\-\-+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, '') // Trim - from end of text
+  }
 
 //QUERY MIDDLEWARE -- use regex to search all type of find
 rentalSchema.pre(/^find/, function(next) {

@@ -60,3 +60,6 @@ exports.getAllUsers = factory.getAll(User);
 
 exports.updateUser = factory.updateOne(User); // only admin can do
 exports.deleteUser = factory.deleteOne(User);
+
+
+

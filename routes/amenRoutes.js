@@ -6,8 +6,6 @@ const router = express.Router();
 
 router.route('/hood/:hood').get(amenController.getAmenInHoodPolygon)
 
-router.route('/:hood/:poi').get(amenController.pointInPolygon)
-
 router.route('/near/:latlng').get( amenController.getAmenitiesNear);
 
 router.route('/line/getAmenities').get( amenController.getAmenLinestring);

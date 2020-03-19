@@ -50,29 +50,5 @@ router
   .get(hoodController.getPtypeList)
 
 
-  //.post( hoodController.createHood);
-// router
-//   .route('/:id')
-//   .get(hoodController.getIdHood)
-// router
-// .route('/getHoodPolygon')
-// .get(hoodController.getHoodPolygon)
-
-
-  //.get(hoodController.getHoodLocation)
-  //.get(hoodController.getHood)
-
-// router
-//   .route('/:hood/:daerah')
-//   .get(hoodController.getHoodStreet) 
-
-
-
-  // .patch( hoodController.updateHood)
-  // .delete(hoodController.deleteHood);
-
-// router
-// .route('/hood/area/state')
-
-
+  
 module.exports = router;

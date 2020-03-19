@@ -3,15 +3,8 @@ const Amenities = require('./../models/amenModel');
 const Rental = require('./../models/rentalModel');
 const Sale = require('./../models/saleModel');
 const catchAsync = require('./../utils/catchAsync');
-//const turf = require('turf-area');
 const d3 = require('d3-polygon');
 
-//<script src="https://d3js.org/d3.v4.min.js"></script>
-//const APIFeatures = require('./../utils/apiFeatures');
-
-
-  
-  //difference: require('@turf/difference')
 
 
 exports.getSaleInHoodPolygon = catchAsync(async (req, res, next) => {
@@ -44,20 +37,6 @@ exports.getSaleInHoodPolygon = catchAsync(async (req, res, next) => {
 });
 
 exports.getHoodInArea = catchAsync(async (req, res, next) => {
-  // const line ={
-  //   type: "LineString",
-  //   coordinates: [
-  //     [
-  //       101.6458511352539,
-  //       3.115148067976796
-  //     ],
-  //     [
-  //       101.70833587646484,
-  //       3.1871368298058167
-  //     ]
-  //   ]
-  // }
-
  const poly = {
     type:"Polygon",
    
@@ -220,7 +199,7 @@ exports.getPtypeList = catchAsync(async (req, res) => {
 
 
 
-exports.getHoodLocation = catchAsync( async (req, res) => {
+exports.getHoodLocation = catchAsync( async (req, res) => {   // get location coor for that hood
 
   const doc = await Hood.find(req.params);
   
@@ -244,49 +223,71 @@ exports.getHoodLocation = catchAsync( async (req, res) => {
 
 });
 
+exports.getAllHoods = catchAsync(async(req,res) => {
+  let filter = {};
+  if(req.params.hoodId) filter = { hood: req.params.hoodId };
+
+    // EXECUTE QUERY
+    const features = new APIFeatures(Hood.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate()
+    const hoods = await features.query;
+
+    // SEND RESPONSE
+    res.status(200).json({
+      status: 'success',
+      results: hoods.length,
+      data: {
+        hoods
+
+      }
+    });
+})
 
 //try to display the page
-exports.getAllHoods = catchAsync(async(req,res) => {
+// exports.getAllHoods = catchAsync(async(req,res) => {
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 2000;
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 2000;
 
-  var query = {};
+//   var query = {};
   
-  Hood.find(query)
+//   Hood.find(query)
     
-    .sort({ voter: -1 })
-    .skip(page * limit) //Notice here
-    .limit(limit)
-    .exec((err,doc) => {
+//     .sort({ voter: -1 })
+//     .skip(page * limit) //Notice here
+//     .limit(limit)
+//     .exec((err,doc) => {
       
-      if (err) {
-        return res.json(err);
-      }
-      Hood.countDocuments(query).exec((count_error, count) => {
-        if (err) {
-          return res.json(count_error);
-        }
+//       if (err) {
+//         return res.json(err);
+//       }
+//       Hood.countDocuments(query).exec((count_error, count) => {
+//         if (err) {
+//           return res.json(count_error);
+//         }
         
-        res.status(200).json({
+//         res.status(200).json({
          
-          total: count,
-          total_remain: Math.ceil(count-(limit*page)),
-          total_page: Math.ceil(count/limit),
-          page_remain: Math.ceil((count/limit)-page),
-          page: page,
-          total_listing: doc.length,
-          Hoods: doc,
+//           total: count,
+//           total_remain: Math.ceil(count-(limit*page)),
+//           total_page: Math.ceil(count/limit),
+//           page_remain: Math.ceil((count/limit)-page),
+//           page: page,
+//           total_listing: doc.length,
+//           Hoods: doc,
          
                   
-      },
-    );
+//       },
+//     );
    
-      })
-    })
+//       })
+//     })
 
     
-});
+// });
 
 exports.getDistances = catchAsync(async (req, res, next) => {
 

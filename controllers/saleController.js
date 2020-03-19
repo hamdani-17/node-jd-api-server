@@ -5,7 +5,6 @@ const catchAsync = require('./../utils/catchAsync');
 //const AppError = require('./../utils/appError');
 const factory = require ('./handlerFactory');
 const APIFeatures = require('./../utils/apiFeatures');
-
 //Aliasing
 exports.expensive = async (req, res, next) => {
   req.query.limit = 20;
@@ -66,9 +65,9 @@ exports.getAllSales = catchAsync( async (req, res) => {
     });
 }) 
 
-
 exports.getSaleNeigborhood =catchAsync( async (req, res) => {
   const hood = await Sale.find(req.params); //dapat harta mas
+  // console.log(hood);
 
   res.status(200).json({
     status: 'success',
@@ -115,14 +114,16 @@ exports.deleteSale = factory.deleteOne(Sale);
 
 
 exports.getStat = catchAsync(async (req, res) => {
+
+  const state = req.params
+  console.log(state)
+
   const stats = await Sale.aggregate([
    
     {
-      $match: { state: "Wilayah Persekutuan Kuala Lumpur" } // area = what query?
+      $match: state // state = {state = 'johor'}
     },
-    // {
-    //   $unwind: '$location.coordinates'
-    // },
+  
     {
       $group: {
         _id: {p_type:'$p_type', place:'$place', coor: '$location.coordinates'},
@@ -144,19 +145,13 @@ exports.getStat = catchAsync(async (req, res) => {
       $sort: {avgPrice: 1,  avgSize: 1}
     },
     {
-      // $project: {
-      //   _id:1,
-      //   place:1,
-      //   info:{
-      //     avgPrice: { avgPrice: '$price' },
-      //     avgSize: '$built_up_sf' 
-      //   }
       $project: {avgPrice:1, maxPrice:1 }
       
     },
     {$limit: 100}
     //{ $count: 'total'}
   ]);
+  //console.log(stats)
 
   res.status(200).json({
     status: 'success',
@@ -167,7 +162,7 @@ exports.getStat = catchAsync(async (req, res) => {
   });
 });
 
-exports.getStatPlace = catchAsync(async (req, res) => {
+exports.getPlaceList = catchAsync(async (req, res) => {
   const stats = await Sale.aggregate([
     {
       $match: { price: { $gte: 40000 } } // area = what query?
@@ -195,6 +190,7 @@ exports.getStatPlace = catchAsync(async (req, res) => {
 
   res.status(200).json({
     status: 'success',
+    count: stats.length,
     data: {
       stats
     }
@@ -231,39 +227,25 @@ exports.getSummary = catchAsync(async (req, res, next) => {
 });
 
 // test learning aggregate
-exports.gettest = catchAsync(async (req, res, next) => {
-  const summary = await Sale.aggregate([
-    // {
-    //   $match:{
-    //     _id:{}
-    //   }
-    // },
+exports.getHoodName = catchAsync(async (req, res, next) => {
+  const neighborhood = await Sale.aggregate([
+
     {
       $group: {
-        _id: {area: "$area", p_type:"$p_type"},
-        num: { $sum: 1 },
-        Price: { $sum: '$price' },
-        maxPrice: { $max: '$price' },
-        minPrice: { $min: '$price' },
-        Size: { $sum: '$built_up_sf' },
-        Psf: { $sum: '$psf' },
-        Duration: { $sum: '$duration' },
-        Var: { $sum: '$var' },
-        VarPct: { $sum: '$var_pct' }
-        //places: { $push: '$area' }
+        _id: "$neighborhood"
       }
     }
   ]);
 
   res.status(200).json({
     status: 'success',
-    count: summary.length,
+    count: neighborhood.length,
     data: {
-      summary
+      neighborhood
     }
   });
 
-  console.log(this.getSummary);
+  
 });
 
 exports.getSalesNear = catchAsync(async(req,res,next) => {  
@@ -294,34 +276,6 @@ exports.getSalesNear = catchAsync(async(req,res,next) => {
     
   });
 
-exports.getSalePOI = catchAsync(async(req,res,next) => {  
-  
-    const point = await Sale.find(req.params);
-    const [doc] = point.map(Sale =>Sale.location.coordinates);
-   
-    //const [ lat, lng] = latlng.split(',');
-
-          const sales = await Sale.find({
-            location: {
-              $near: {
-               $maxDistance: 100,
-               $geometry: {
-                type: "Point",
-                coordinates: doc
-               },
-              }
-             }
-            })
-  
-        res.status(200).json({
-          status: 'success',
-          results: sales.length,
-          data: {
-            data: sales
-          }
-        });
-    
-});
 
   
 exports.getDistances = catchAsync(async ( req,res,next) => {
@@ -440,14 +394,7 @@ exports.getTrainLine = catchAsync(async (req, res, next) => {
   console.log(this.getSummary);
 });
 
-// const area = await Hood.find(req.params)
-//   const match = area.map(Hood =>Hood.area_group);
-//   console.log(match);
 
-//   const summary = await Sale.aggregate([
-//     {
-//       $match: {area: match} 
-//     },
 exports.getTrainType_place = catchAsync(async (req, res, next) => {
 
   const train = req.params
@@ -477,62 +424,29 @@ exports.getTrainType_place = catchAsync(async (req, res, next) => {
 
   console.log(this.getSummary);
 });
-  //'/sales-within/:distance/center/:latlng/unit/:unit', saleController.getSaleWithin
-  // 
- // /sales-within/233/center/1.995633, 102.949982/unit/mi
 
-// exports.getSalesWithin = catchAsync( async (req,res,next) => {
-//   const { distance, latlng, unit } = req.params;
-//   const [ lat, lng] = latlng.split(',');
+// reduce() example 
+exports.reduce = catchAsync( async (res) => {
+  const numbers = [175, 50, 25];
 
-//   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  function getSum(total, num) {
+    return total - Math.round(num);
+  }
 
-//   if( !lat || !lng){
-//     next(
-//       new AppError(
-//         'please provide latitude and longitude in the format lat,lng', 400
-//       )
-//     );
-//   }
-
-//   const sales = await Sale.find({
-//  location: { $geoWithin: { $centerSphere: [ [ lng, lat], radius] } }
-//   });
-
+  const test1 = numbers.reduceRight(getSum,0)
   
-//   res.status(200).json({
-//     status: 'success',
-//     results: sales.length,
-//     data: {
-//       data: sales
-//     }
-//   });
-// });
 
+  // const test = numbers.reduce((total,currentValue) => {
+  //   return total - currentValue;
+  // });
+  console.log(test1);
 
-
-
-
- // const multiplier = unit === 'mi'? 0.000621371 : 0.001;
-
-  // if( !lat || !lng){
-  //   next(
-  //     new AppError(
-  //       'please provide latitude and longitude in the format lat,lng', 400
-  //     )
-  //   );
-  // }
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: test
+      }
+    });
+  
+  });
  
-
-  // const distances = await Sale.aggregate([
-  //   {
-  //     $geoNear :{
-  //         near: {
-  //           type: 'Point',
-  //           coordinates : [ lng * 1, lat * 1]
-  //         },
-  //         distanceField: 'distance',
-  //         distanceMultiplier: multiplier
-  //     }
-  //   },
-

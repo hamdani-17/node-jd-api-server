@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const slugify = require('slugify');
+//const slugify = require('slugify');
 const mongoosePaginate = require('mongoose-paginate');
+const slug = require('mongoose-slug-updater');
 // const User = require ('./userModel');
 // const validator = require('validator');
 
@@ -23,10 +24,13 @@ const saleSchema = new Schema({
         type: String,
         required: [true, 'A property must have a neighborhood']
       },
+    slug: String,
     area:{
         type: String,
+        trim: true,
         required: [true, 'A property must have a area']
       },
+   
     p_type:{
         type: String,
         required: [true, 'A property must have a price']
@@ -180,7 +184,6 @@ const saleSchema = new Schema({
       type: String,
       required:[true, 'A property must have a distance_to_private_school'],
     },
-    slug: String,
     createdAt: {
         type: Date,
         default: Date.now(),
@@ -227,7 +230,7 @@ const saleSchema = new Schema({
 
   //DOCUMENT MIDDLEWARE: runs before .save() and .create()
   saleSchema.pre('save', function(next) {
-    this.slug = slugify(this.place, {lower:true});
+    this.slug = slugify(this.area, {lower:true});
     next();
   });
 
@@ -258,6 +261,7 @@ const saleSchema = new Schema({
   });
 
 
+  saleSchema.plugin(slug);
 
   saleSchema.plugin(mongoosePaginate);
 

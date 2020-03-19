@@ -111,32 +111,6 @@ exports.updateRental  = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.getRentalInHood = catchAsync(async (req, res, next) => {
-
-  const poly = await Hood.find(req.params);// dapat kuchai
-  const [doc] = poly.map(Hood =>Hood.location.coordinates); 
-
-    const doc1 =  await Rental.find({
-      locations : {
-          $geoWithin: {
-              $geometry:{
-                type:"Polygon",
-                coordinates: doc
-          }
-        }
-      }
-    });
-    //console.log( sale);
-   
-    res.status(200).json({
-      status: 'success',
-      count: doc1.length,
-      data: {
-        data: doc1
-      }
-    });
-  
-});
 
 exports.getRentalNear = catchAsync(async(req,res,next) => {  
 

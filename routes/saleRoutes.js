@@ -38,11 +38,12 @@ router
   .route('/worstvaluepct')
   .get(saleController.worstValuePct, saleController.getAllSales); // includes middleware
 
-router.route('/getstat').get(saleController.getStat);
-router.route('/getPlaceList').get(saleController.getStatPlace);
-router.route('/aggtest').get(saleController.gettest);
+router.route('/getstate/:state').get(saleController.getStat);
+router.route('/getPlaceList').get(saleController.getPlaceList);
+router.route('/gethood').get(saleController.getHoodName);
 router.route('/trainType').get(saleController.getTrainType);
 router.route('/trainLine').get(saleController.getTrainLine);
+router.route('/reduce').get(saleController.reduce)
 
 router.route('/getsummary').get(saleController.getSummary);
 router.route('/:neighborhood').get(saleController.getSaleNeigborhood);
@@ -50,7 +51,7 @@ router.route('/train_type/:train_type').get(saleController.getTrainType_place);
 //authController.protect, authController.restrictTo('admin', 'lead-guide', 'guide'),
 
 router
-   .route('/distance/:unit')
+   .route('/:latlng/distance/:unit')
    .get( saleController.getDistances);
 
 router
@@ -60,7 +61,8 @@ router
 router
   .route('/')
   .get( saleController.getAllSales)
-  .post(authController.protect, authController.restrictTo('admin', 'lead-guide'),saleController.createSale);
+  .post(saleController.createSale);
+  // authController.protect,authController.restrictTo('admin', 'lead-guide')
 
 router
   .route('/:id')

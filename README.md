@@ -1,4 +1,4 @@
-# RED ANGPOW API SERVER
+# API SERVER
 
 ## Installation
 
